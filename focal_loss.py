@@ -110,13 +110,13 @@ class Prostate_data(Dataset):
 
         # white
         if rgb_n[0] > 0.8 and rgb_n[1] > 0.8 and rgb_n[2] > 0.8:
-            return 2
+            return 4
         # red
         elif rgb_n[0] > 0.8 and rgb_n[1] < 0.8 and rgb_n[2] < 0.8:
-            return 1
+            return 3
         # yellow
         elif rgb_n[0] > 0.8 and rgb_n[1] > 0.8 and rgb_n[2] < 0.8:
-            return 1
+            return 2
         # green
         elif rgb_n[0] < 0.8 and rgb_n[1] > 0.8 and rgb_n[2] < 0.8:
             return 0
@@ -133,7 +133,7 @@ def soft_dice_loss(y_pred,y_true):
        compute the soft dice loss
 
        '''
-    y_true = y_true.view(-1,3,256,256)
+    y_true = y_true.view(-1,5,256,256)
     epsilon = 1e-7
     dice_numerator = epsilon + 2 * torch.sum(y_true*y_pred,axis=(2,3))
     dice_denominator = epsilon + torch.sum(y_true*y_true,axis=(2,3)) + torch.sum(y_pred*y_pred,axis=(2,3))
@@ -247,7 +247,7 @@ def main():
             #     axes[j].imshow(imgs[j])
             # plt.show()
 
-            model = ResUnet(num_classes=3,dprob=dprob)
+            model = ResUnet(num_classes=5,dprob=dprob)
             criterion = Focalloss(gamma=gamma)
             optimizer = torch.optim.SGD(model.parameters(),lr=lr,momentum=0.9)
             scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,patience=10)
